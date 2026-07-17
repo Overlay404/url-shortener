@@ -3,12 +3,22 @@ package config
 import (
 	"fmt"
 	"os"
+	"flag"
 
 	"gopkg.in/yaml.v3"
 )
 
-func Load(path string) (*Config, error) {
-	data, err := os.ReadFile(path)
+func Load() (*Config, error) {
+
+	configPath := flag.String(
+		"config",
+		"./configs/config.yaml",
+		"path to config yaml",
+	)
+
+	flag.Parse()
+
+	data, err := os.ReadFile(*configPath)
 	if err != nil {
 		return nil, fmt.Errorf("read config: %w", err)
 	}

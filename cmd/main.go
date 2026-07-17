@@ -1,5 +1,44 @@
 package main
 
-func main(){
+import (
+	"context"
+	"log"
+	"log/slog"
+	"os"
+	"url-shortener/internal/config"
+)
+
+const (
+	envLocal      = "local"
+	envDevelopment = "dev"
+	envProduction  = "prod"
+)
+
+func main() {
+	conf, errConf := config.Load()
+	if errConf != nil{
+		log.Fatalf("Failed to load config %w", errConf)
+	}
+
+	log := slogLogger(conf.App.LevelLogs)
+	log.Debug("Config loaded", "config", 
+		slog.String("App", conf.App.LevelLogs),
+	)
+
+	ctx := context.Background()
+
 	
+}
+
+func slogLogger(env string) *slog.Logger {
+	var log *slog.Logger
+	switch env {
+	case envLocal:
+		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	case envProduction:
+		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	case envDevelopment:
+		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	}
+	return log
 }
