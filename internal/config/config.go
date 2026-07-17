@@ -10,9 +10,8 @@ type AppConfig struct {
 }
 
 type RedisConfig struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
+	Addr     string `yaml:"addr"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
-	DB       string `yaml:"db"`
+	DB       int    `yaml:"db"`
 }
