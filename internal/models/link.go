@@ -3,9 +3,9 @@ package models
 import "encoding/json"
 
 type Link struct {
-	Url     string
-	Clicks  int
-	Created int
+	Url     string `json:"url"`
+	Clicks  int    `json:"clicks"`
+	Created int    `json:"created"`
 }
 
 func (l *Link) MarshalBinary() ([]byte, error) {

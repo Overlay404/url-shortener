@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"url-shortener/internal/config"
 	"url-shortener/internal/models"
-	"url-shortener/pkg"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -35,22 +34,20 @@ func (r *Repos) Init() {
 	})
 }
 
-func (r *Repos) Set(link *models.Link) error {
-	urlShort := pkg.GenShortUrl(6)
-	err := Client.Set(*r.ctx, urlShort, link, 0).Err()
+func (r *Repos) Set(urlShort string, link *models.Link) error {
+	err := Client.Set(*r.ctx, urlShort, &link, 0).Err()
 	if err != nil {
 		return fmt.Errorf("cannot set value in Redis %w", err)
 	}
 	r.log.Debug("write in redis value", slog.Any("link", &link))
-	pkg.WriteInFile(urlShort, r.log)
 	return nil
 }
 
-//не закончил: получение по ссылке значение, преобразование link из byte[], возрат *link
-func (r *Repos) Get() error {
-	err := Client.Set(*r.ctx, "key", "value", 0).Err()
+func (r *Repos) Get(urlShort string) (link *models.Link, err error) {
+	err = Client.Get(*r.ctx, urlShort).Scan(&link)
 	if err != nil {
-		return fmt.Errorf("cannot set value in Redis %w", err)
+		return nil, fmt.Errorf("cannot set value in Redis %w", err)
 	}
-	return nil
+	r.log.Debug("get value from redis", slog.Any("link", &link))
+	return link, nil
 }
