@@ -8,15 +8,15 @@ import (
 
 func WriteInFile(text string, log *slog.Logger) error {
 	data := []byte(text + "\n")
-	file, err := os.Create("short-urls.bin")
+	file, err := os.OpenFile("short-urls.bin", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		log.Debug("cannot write in file", slog.String("err", err.Error()))
 		return err
 	}
 	defer file.Close()
 	file.Write(data)
-
-	log.Debug("Write in file", slog.String("text", text))
+	s, _ := file.Stat()
+	log.Debug("Write in file", slog.String("text", text), slog.Any("file", s))
 	return nil
 }
 

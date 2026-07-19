@@ -5,7 +5,7 @@ import "encoding/json"
 type Link struct {
 	Url     string `json:"url"`
 	Clicks  int    `json:"clicks"`
-	Created int    `json:"created"`
+	Created string `json:"created"`
 }
 
 func (l *Link) MarshalBinary() ([]byte, error) {

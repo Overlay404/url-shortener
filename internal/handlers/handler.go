@@ -22,13 +22,15 @@ func New(serv *services.Service, logger *slog.Logger) (h *Handler) {
 }
 
 func (h *Handler) Set(c *gin.Context) {
-	var link *models.Link
+	var link models.Link
+
 	if err := c.ShouldBindJSON(&link); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	h.log.Debug("json formated", slog.Any("link", link))
 
-	urlShort, err := h.serv.Set(link)
+	urlShort, err := h.serv.Set(&link)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

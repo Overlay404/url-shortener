@@ -22,7 +22,7 @@ const (
 func main() {
 	conf, errConf := config.Load()
 	if errConf != nil {
-		log.Fatalf("Failed to load config %w", errConf)
+		log.Fatalf("Failed to load config %s", errConf.Error())
 	}
 
 	log := slogLogger(conf.App.LevelLogs)
@@ -31,9 +31,10 @@ func main() {
 	)
 
 	ctx := context.Background()
-	repos := repositories.New(&ctx, conf, log)
+	repos := repositories.New(ctx, conf, log)
 	serv := services.New(repos, log)
 	h := handlers.New(serv, log)
+	repos.Init()
 
 	router := gin.Default()
 	router.GET("v1/g/:url", h.Get)

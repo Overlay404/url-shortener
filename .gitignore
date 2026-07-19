@@ -2,3 +2,4 @@
 go.sum
 config.yaml
 redisdata/*
+short-urls.bin
