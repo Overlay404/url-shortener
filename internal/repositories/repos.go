@@ -50,5 +50,27 @@ func (r *Repos) Get(urlShort string) (link *models.Link, err error) {
 		return nil, fmt.Errorf("cannot set value in Redis %w", err)
 	}
 	r.log.Debug("get value from redis", slog.Any("link", link))
+	r.log.Debug("get value from redis", slog.Any("link", link))
 	return link, nil
+}
+
+func (r *Repos) Click(urlShort string) error {
+	link := &models.Link{}
+
+	err := Client.Get(r.ctx, urlShort).Scan(link)
+	if err != nil {
+		return fmt.Errorf("cannot get value in redis: %w", err)
+	}
+
+	link.Clicks++
+
+	err = Client.Set(r.ctx, urlShort, link, 0).Err()
+	if err != nil {
+		return fmt.Errorf("cannot set value in redis: %w", err)
+	}
+
+	r.log.Debug("click increment", slog.String("urlShort", urlShort), slog.Int("clicks", link.Clicks),
+	)
+
+	return nil
 }

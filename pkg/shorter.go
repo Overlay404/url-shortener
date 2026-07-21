@@ -3,6 +3,7 @@ package pkg
 import (
 	"math/rand"
 	"time"
+	"unicode/utf8"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -17,7 +18,7 @@ func GenShortUrl(lenght int) string {
 func GenString(lenght int, charset string) string {
 	res := make([]byte, lenght)
 	for i := range res {
-		res[i] = charset[seededRand.Intn(lenght)]
+		res[i] = charset[seededRand.Intn(utf8.RuneCountInString(charset))]
 	}
 	return string(res)
 }

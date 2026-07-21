@@ -1,9 +1,9 @@
 package pkg
 
 import (
-	"io"
 	"log/slog"
 	"os"
+	"strings"
 )
 
 func WriteInFile(text string, log *slog.Logger) error {
@@ -20,22 +20,13 @@ func WriteInFile(text string, log *slog.Logger) error {
 	return nil
 }
 
-func ReadFromFile(log *slog.Logger) (res string, err error) {
-	var n int
-	file, err := os.Open("short-urls.bin")
+func ReadFromFile(log *slog.Logger) ([]string, error) {
+	data, err := os.ReadFile("short-urls.bin")
 	if err != nil {
 		log.Debug("cannot read from file", slog.String("err", err.Error()))
-		return "", err
+		return nil, err
 	}
-	defer file.Close()
 
-	data := make([]byte, 64)
-	for {
-		n, err = file.Read(data)
-		if err == io.EOF {
-			break
-		}
-	}
-	log.Debug("Read file short-urls.bin")
-	return string(data[:n]), nil
+	log.Debug("Read file short-urls.bin", slog.String("value", string(data)))
+	return strings.Fields(string(data)), nil
 }

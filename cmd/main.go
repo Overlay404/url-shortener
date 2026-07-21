@@ -38,6 +38,9 @@ func main() {
 
 	router := gin.Default()
 	router.GET("v1/g/:url", h.Get)
+	router.GET("v2/g/:url", h.GetV2)
+	router.GET("v2/all", h.GetAllShortLink)
+	router.GET("v2/set", h.SetLink)
 	router.POST("v1/set", h.Set)
 	router.Run(":8000")
 }

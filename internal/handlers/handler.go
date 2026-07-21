@@ -3,6 +3,7 @@ package handlers
 import (
 	"log/slog"
 	"net/http"
+	"strings"
 	"url-shortener/internal/models"
 	"url-shortener/internal/services"
 
@@ -48,4 +49,46 @@ func (h *Handler) Get(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, link)
+}
+
+func (h *Handler) GetV2(c *gin.Context) {
+	urlShort := c.Param("url")
+	link, err := h.serv.Get(urlShort)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	h.serv.ClickLink(urlShort)
+	url := link.Url
+	if !strings.Contains(url, "http") {
+		url = "https://www." + link.Url
+	}
+	c.Redirect(http.StatusMovedPermanently, url)
+}
+
+func (h *Handler) SetLink(c *gin.Context) {
+	url := c.Query("url")
+	if url == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "value url empty"})
+		return
+	}
+	h.log.Debug("get parameter", slog.String("url", url))
+
+	urlShort, err := h.serv.SetLink(url)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, urlShort)
+}
+
+func (h *Handler) GetAllShortLink(c *gin.Context) {
+	shortUrls, err := h.serv.LoadAllShortUrl()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, shortUrls)
 }
